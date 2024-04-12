@@ -117,8 +117,9 @@ app.post("/deletePath", async (req, res) => {
 
     if (val.deleted == true) {
       await jsonCollection.insertOne(val);
-    }
-    res.status(200).json({ message: "JSON collection updated successfully" });
+    }  
+    const documents = await jsonCollection.find({}).toArray();
+    res.status(200).json(documents); // Return the documents as JSON response
   } catch (err) {
     console.error("Error updating JSON collection:", err);
     res.status(500).json({ error: "Internal Server Error" });
