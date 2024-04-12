@@ -1,19 +1,20 @@
-const express = require('express');
-const { MongoClient } = require('mongodb');
-const dotenv = require('dotenv');
-const bodyParser = require('body-parser');
+const express = require("express");
+const { MongoClient } = require("mongodb");
+const dotenv = require("dotenv");
+const bodyParser = require("body-parser");
 
-const cors = require('cors'); // Import the cors middleware
+const cors = require("cors"); // Import the cors middleware
 
 dotenv.config(); // Load environment variables from .env file
 
 const app = express();
 const port = process.env.PORT || 3000; // Use the PORT environment variable or default to 3000
 
-var json  = null;
+var json = null;
 
 // MongoDB connection string
-const uri = "mongodb+srv://harshitdb3:Harshitdb3@cluster1.lqihvmv.mongodb.net/TextTo3D?retryWrites=true&w=majority&appName=Cluster1";
+const uri =
+  "mongodb+srv://harshitdb3:Harshitdb3@cluster1.lqihvmv.mongodb.net/TextTo3D?retryWrites=true&w=majority&appName=Cluster1";
 
 // Create a MongoClient
 const client = new MongoClient(uri, {
@@ -43,9 +44,8 @@ app.use(async (req, res, next) => {
 });
 
 // API endpoint to get the JSON collection
-app.get('/getDeleted', async (req, res) => {
+app.get("/getDeleted", async (req, res) => {
   try {
-
     const db = client.db("TextTo3D");
     const jsonCollection = db.collection("Data");
     // Fetch documents from the collection
@@ -58,12 +58,12 @@ app.get('/getDeleted', async (req, res) => {
 });
 
 // const getJson = async () => {
-    
+
 //     if(json != null)
 //     return json;
 //     else {
 //     const db = client.db("TextTo3D");
-//     const jsonCollection = db.collection("Data"); 
+//     const jsonCollection = db.collection("Data");
 //     // Fetch documents from the collection
 //     const documents = await jsonCollection.find({}).toArray();
 //     json = documents;
@@ -92,47 +92,35 @@ app.get('/getDeleted', async (req, res) => {
 //     }
 // }
 
-app.post('/deletePath', async (req, res) => {
-    console.log("Updating JSON collection");
-    console.log("Updating JSON collection");
+app.post("/deletePath", async (req, res) => {
+  console.log("Updating JSON collection");
+  console.log("Updating JSON collection");
 
-    try {
-        var val = {
-            path: req.body.path,
-            deleted: req.body.deleted,
-        };
+  try {
+    var val = {
+      path: req.body.path,
+      deleted: req.body.deleted,
+    };
 
-        const db = client.db("TextTo3D");
-        const jsonCollection = db.collection("Data");
+    const db = client.db("TextTo3D");
+    const jsonCollection = db.collection("Data");
 
-        // Find the document with the specified path
-        const document = await jsonCollection.findOne({ path: val.path }
-            );
-        if(document != null)
-        {
-        // Update the document's deleted property
-        document.deleted = val.deleted;
-        // Update the document in the collection
-        await jsonCollection.updateOne({ path: val.path }, { $set: document });
-        }
-        else
-        {
-            // Insert new
-            await jsonCollection.insertOne(val);
-            console.log("Inserted new");
-        }
- 
-        res.status(200).json({ message: "JSON collection updated successfully" });
-    } catch (err) {
-        console.error("Error updating JSON collection:", err);
-        res.status(500).json({ error: "Internal Server Error" });
+    const document = await jsonCollection.findOne({ path: val.path });
+
+    if (document != null && val.deleted == true) {
+      await jsonCollection.deleteOne({ path: val.path });
+      console.log("Deleted");
+    } else {
+      await jsonCollection.insertOne(val);
     }
+    res.status(200).json({ message: "JSON collection updated successfully" });
+  } catch (err) {
+    console.error("Error updating JSON collection:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
-
-  
-  // Start the server
-  app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-  });
-  
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
