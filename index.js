@@ -94,7 +94,6 @@ app.get("/getDeleted", async (req, res) => {
 
 app.post("/deletePath", async (req, res) => {
   console.log("Updating JSON collection");
-  console.log("Updating JSON collection");
 
   try {
     var val = {
@@ -102,17 +101,21 @@ app.post("/deletePath", async (req, res) => {
       deleted: req.body.deleted,
     };
 
+    // Check if the path is a directory
+    const isDirectory = !val.path.endsWith(".glb");
+
     const db = client.db("TextTo3D");
     const jsonCollection = db.collection("Data");
 
-    const document = await jsonCollection.findOne({ path: val.path });
-
-    if (document != null) {
+    // If the path is a directory, find and delete all documents that contain the path as a substring
+    if (isDirectory) {
+      await jsonCollection.deleteMany({ path: { $regex: val.path } });
+    } else {
+      // If it's a file, delete the document with exactly the same path
       await jsonCollection.deleteOne({ path: val.path });
-    } 
-    
-    if(val.deleted == true)
-    {
+    }
+
+    if (val.deleted == true) {
       await jsonCollection.insertOne(val);
     }
     res.status(200).json({ message: "JSON collection updated successfully" });
@@ -121,6 +124,7 @@ app.post("/deletePath", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 // Start the server
 app.listen(port, () => {
