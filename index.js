@@ -107,10 +107,12 @@ app.post("/deletePath", async (req, res) => {
 
     const document = await jsonCollection.findOne({ path: val.path });
 
-    if (document != null && val.deleted == true) {
+    if (document != null) {
       await jsonCollection.deleteOne({ path: val.path });
-      console.log("Deleted");
-    } else {
+    } 
+    
+    if(val.deleted == true)
+    {
       await jsonCollection.insertOne(val);
     }
     res.status(200).json({ message: "JSON collection updated successfully" });
