@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node --loader ts-node/esm src/index.mts",
+    "docker": "npm run docker:build && npm run docker:run",
+    "docker:build": "docker build -t template-node-express .",
+    "docker:run": "docker run -it -p 7860:7860 template-node-express"
   },
   "author": "",
   "license": "ISC",

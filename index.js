@@ -105,8 +105,19 @@ app.post('/deletePath', async (req, res) => {
         const db = client.db("TextTo3D");
         const jsonCollection = db.collection("Data");
 
+        // Find the document with the specified path
+        const document = await jsonCollection.findOne({ path: val.path }
+            );
+        if(document == null)
+        {
+            console.log("Document not found");
+            return;
+        }
+        // Update the document's deleted property
+        document.deleted = val.deleted;
+        // Update the document in the collection
+        await jsonCollection.updateOne({ path: val.path }, { $set: document });
 
-        await jsonCollection.insertOne(val);
 
 
         res.status(200).json({ message: "JSON collection updated successfully" });
