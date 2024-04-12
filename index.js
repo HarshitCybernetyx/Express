@@ -108,18 +108,20 @@ app.post('/deletePath', async (req, res) => {
         // Find the document with the specified path
         const document = await jsonCollection.findOne({ path: val.path }
             );
-        if(document == null)
+        if(document != null)
         {
-            console.log("Document not found");
-            return;
-        }
         // Update the document's deleted property
         document.deleted = val.deleted;
         // Update the document in the collection
         await jsonCollection.updateOne({ path: val.path }, { $set: document });
-
-
-
+        }
+        else
+        {
+            // Insert new
+            await jsonCollection.insertOne(val);
+            console.log("Inserted new");
+        }
+ 
         res.status(200).json({ message: "JSON collection updated successfully" });
     } catch (err) {
         console.error("Error updating JSON collection:", err);
