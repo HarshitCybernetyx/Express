@@ -8,7 +8,7 @@ const cors = require("cors"); // Import the cors middleware
 dotenv.config(); // Load environment variables from .env file
 
 const app = express();
-const port = process.env.PORT || 3000; // Use the PORT environment variable or default to 3000
+const port = 8080; // Use the PORT environment variable or default to 3000
 
 var json = null;
 
